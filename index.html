@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Registration System</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+body { background: #1a1a2e; color: #fff; min-height: 100vh; }
+.header { background: #0d0d1a; padding: 16px 28px; }
+.header h1 { font-size: 22px; font-weight: 900; letter-spacing: 1px; }
+.header h1 span { color: #6c63ff; }
+.header p { font-size: 11px; color: #888; margin-top: 3px; }
+.nav { display: flex; background: #0d0d1a; border-bottom: 1px solid #2a2a4a; }
+.nav button { padding: 13px 36px; background: transparent; border: none; color: #aaa; cursor: pointer; font-size: 13px; font-weight: 500; }
+.nav button.active { background: #6c63ff; color: #fff; }
+.content { padding: 24px 28px; max-width: 900px; }
+.page { display: none; }
+.page.active { display: block; }
+.success-bar { background: #1a3a2a; border: 1px solid #2d7a50; color: #5dba8a; padding: 10px 16px; border-radius: 6px; font-size: 13px; margin-bottom: 16px; text-align: center; }
+.section-title { font-size: 15px; font-weight: 600; margin-bottom: 16px; border-left: 3px solid #6c63ff; padding-left: 10px; color: #fff; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: 10px; color: #888; letter-spacing: 0.8px; text-transform: uppercase; }
+.form-group input { background: #0d0d1a; border: 1px solid #2a2a4a; border-radius: 4px; padding: 9px 12px; color: #fff; font-size: 13px; outline: none; width: 100%; }
+.form-group input:disabled { opacity: 0.5; }
+.form-group input:focus { border-color: #6c63ff; }
+.note { font-size: 10px; color: #666; margin-top: 3px; }
+.btn-register { background: #6c63ff; color: #fff; border: none; border-radius: 4px; padding: 10px 22px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-find { background: #e24b4a; color: #fff; border: none; border-radius: 4px; padding: 9px 22px; font-size: 13px; cursor: pointer; }
+.btn-update { background: #6c63ff; color: #fff; border: none; border-radius: 4px; padding: 10px 22px; font-size: 13px; cursor: pointer; margin-right: 8px; }
+.btn-cancel { background: transparent; color: #aaa; border: 1px solid #2a2a4a; border-radius: 4px; padding: 10px 16px; font-size: 13px; cursor: pointer; }
+.btn-search { background: #6c63ff; color: #fff; border: none; border-radius: 4px; padding: 9px 22px; font-size: 13px; cursor: pointer; }
+.search-section { margin-top: 20px; border-top: 1px solid #2a2a4a; padding-top: 20px; }
+.search-row { display: flex; gap: 10px; align-items: flex-end; }
+.err { color: #e24b4a; font-size: 12px; margin-bottom: 8px; display: none; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { background: #0d0d1a; color: #888; font-size: 10px; text-transform: uppercase; padding: 10px 12px; text-align: left; border-bottom: 1px solid #2a2a4a; }
+td { padding: 10px 12px; border-bottom: 1px solid #1a1a2e; color: #ccc; }
+.roll-badge { background: #2a2a4a; color: #6c63ff; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 700; }
+.btn-edit { background: #6c63ff; color: #fff; border: none; border-radius: 3px; padding: 4px 10px; font-size: 11px; cursor: pointer; margin-right: 4px; }
+.btn-del { background: #e24b4a; color: #fff; border: none; border-radius: 3px; padding: 4px 10px; font-size: 11px; cursor: pointer; }
+.top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.records-badge { background: #6c63ff; color: #fff; padding: 3px 10px; border-radius: 3px; font-size: 12px; }
+.filter-input { background: #0d0d1a; border: 1px solid #2a2a4a; border-radius: 4px; padding: 6px 10px; color: #fff; font-size: 12px; outline: none; width: 200px; }
+.update-success { background: #1a3a2a; border: 1px solid #2d7a50; color: #5dba8a; padding: 8px 14px; border-radius: 4px; font-size: 12px; margin-top: 10px; display: none; }
+.footer { text-align: center; color: #555; font-size: 11px; margin-top: 30px; padding-bottom: 20px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Student <span>Registration</span> System</h1>
+  <p>MIT-WPU · Full Stack Development Lab 04 · PHP & MySQL CRUD</p>
+</div>
+
+<div class="nav">
+  <button class="active" onclick="showPage('register',this)">+ Register</button>
+  <button onclick="showPage('update',this)">✎ Update</button>
+  <button onclick="showPage('view',this)">❚ View All</button>
+</div>
+
+<div class="content">
+
+  <!-- REGISTER -->
+  <div class="page active" id="page-register">
+    <div id="reg-success" class="success-bar" style="display:none">Student registered successfully!</div>
+    <p class="section-title">| Register New Student</p>
+    <div class="form-row">
+      <div class="form-group"><label>First Name</label><input id="r-fn" type="text" placeholder="First name"></div>
+      <div class="form-group"><label>Last Name</label><input id="r-ln" type="text" placeholder="Last name"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Roll No / ID</label><input id="r-roll" type="text" placeholder="e.g. MIT@123"></div>
+      <div class="form-group"><label>Contact Number</label><input id="r-contact" type="text" placeholder="10-digit number"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Password</label><input id="r-pass" type="password" placeholder="Min 6 characters"></div>
+      <div class="form-group"><label>Confirm Password</label><input id="r-cpass" type="password" placeholder="Re-enter password"></div>
+    </div>
+    <div class="err" id="reg-err"></div>
+    <button class="btn-register" onclick="registerStudent()">Register Student</button>
+
+    <div class="search-section">
+      <p class="section-title">| Search by Roll No</p>
+      <div class="search-row">
+        <div class="form-group"><label>Roll No</label><input id="s-roll" type="text" placeholder="Enter Roll No" style="width:220px"></div>
+        <button class="btn-search" onclick="searchStudent()">Search</button>
+      </div>
+      <div id="search-res" style="margin-top:10px;font-size:13px;"></div>
+    </div>
+  </div>
+
+  <!-- UPDATE -->
+  <div class="page" id="page-update">
+    <p class="section-title">| Find Student to Update</p>
+    <div style="display:flex;gap:10px;align-items:flex-end;margin-bottom:20px">
+      <div class="form-group"><label>Roll No / ID</label><input id="u-search" type="text" placeholder="Enter Roll No" style="width:240px"></div>
+      <button class="btn-find" onclick="findStudent()">Find</button>
+    </div>
+    <div id="update-card" style="display:none">
+      <p class="section-title" id="update-title">| Update Details</p>
+      <div class="form-row">
+        <div class="form-group"><label>First Name</label><input id="u-fn" type="text"></div>
+        <div class="form-group"><label>Last Name</label><input id="u-ln" type="text"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Roll No / ID</label>
+          <input id="u-roll" type="text" disabled>
+          <p class="note">Roll No cannot be changed.</p>
+        </div>
+        <div class="form-group"><label>Contact Number</label><input id="u-contact" type="text"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:14px;max-width:460px">
+        <label>New Password (leave blank to keep current)</label>
+        <input id="u-pass" type="password" placeholder="Enter new password">
+      </div>
+      <button class="btn-update" onclick="updateStudent()">Update Student</button>
+      <button class="btn-cancel" onclick="cancelUpdate()">← Cancel</button>
+      <div class="update-success" id="update-ok">Student updated successfully!</div>
+    </div>
+  </div>
+
+  <!-- VIEW ALL -->
+  <div class="page" id="page-view">
+    <div class="top-bar">
+      <p class="section-title" style="margin:0">| All Students</p>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="records-badge" id="rec-count">0 Records</span>
+        <input class="filter-input" id="filter" type="text" placeholder="Filter by name or roll no..." oninput="filterTable()">
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>Sr.</th><th>First Name</th><th>Last Name</th><th>Roll No</th><th>Contact</th><th>Registered On</th><th>Actions</th></tr></thead>
+      <tbody id="tbl-body"></tbody>
+    </table>
+    <div class="footer">MIT World Peace University · FSD Lab 04 · Third Year BTech CSE [sem VI]</div>
+  </div>
+
+</div>
+
+<script>
+let students = [];
+
+function showPage(p, btn) {
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(x => x.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  btn.classList.add('active');
+  if (p === 'view') renderTable();
+}
+
+function registerStudent() {
+  const fn = document.getElementById('r-fn').value.trim();
+  const ln = document.getElementById('r-ln').value.trim();
+  const roll = document.getElementById('r-roll').value.trim();
+  const contact = document.getElementById('r-contact').value.trim();
+  const pass = document.getElementById('r-pass').value;
+  const cpass = document.getElementById('r-cpass').value;
+  const err = document.getElementById('reg-err');
+  err.style.display = 'none';
+  if (!fn || !ln || !roll || !contact || !pass) { err.textContent = 'All fields are required.'; err.style.display = 'block'; return; }
+  if (!/^[0-9]{10}$/.test(contact)) { err.textContent = 'Contact must be 10 digits.'; err.style.display = 'block'; return; }
+  if (pass !== cpass) { err.textContent = 'Passwords do not match.'; err.style.display = 'block'; return; }
+  if (pass.length < 6) { err.textContent = 'Password min 6 characters.'; err.style.display = 'block'; return; }
+  if (students.find(s => s.roll === roll)) { err.textContent = 'Roll No already exists.'; err.style.display = 'block'; return; }
+  students.push({ fn, ln, roll, contact, date: new Date().toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}) });
+  document.getElementById('reg-success').style.display = 'block';
+  ['r-fn','r-ln','r-roll','r-contact','r-pass','r-cpass'].forEach(id => document.getElementById(id).value = '');
+  setTimeout(() => document.getElementById('reg-success').style.display = 'none', 3000);
+}
+
+function searchStudent() {
+  const roll = document.getElementById('s-roll').value.trim();
+  const s = students.find(x => x.roll === roll);
+  const res = document.getElementById('search-res');
+  if (s) res.innerHTML = '<div style="background:#0d0d1a;padding:10px;border-radius:4px;border:1px solid #2a2a4a">Found: <strong style="color:#6c63ff">' + s.fn + ' ' + s.ln + '</strong> &nbsp;·&nbsp; ' + s.roll + ' &nbsp;·&nbsp; ' + s.contact + '</div>';
+  else res.innerHTML = '<span style="color:#e24b4a">No student found.</span>';
+}
+
+function findStudent() {
+  const roll = document.getElementById('u-search').value.trim();
+  const s = students.find(x => x.roll === roll);
+  if (s) {
+    document.getElementById('u-fn').value = s.fn;
+    document.getElementById('u-ln').value = s.ln;
+    document.getElementById('u-roll').value = s.roll;
+    document.getElementById('u-contact').value = s.contact;
+    document.getElementById('update-title').textContent = '| Update Details — ' + s.roll;
+    document.getElementById('update-card').style.display = 'block';
+  } else { alert('No student found.'); }
+}
+
+function updateStudent() {
+  const roll = document.getElementById('u-roll').value;
+  const s = students.find(x => x.roll === roll);
+  if (s) { s.fn = document.getElementById('u-fn').value.trim(); s.ln = document.getElementById('u-ln').value.trim(); s.contact = document.getElementById('u-contact').value.trim(); }
+  document.getElementById('update-ok').style.display = 'block';
+  setTimeout(() => { document.getElementById('update-ok').style.display = 'none'; document.getElementById('update-card').style.display = 'none'; }, 2000);
+}
+
+function cancelUpdate() { document.getElementById('update-card').style.display = 'none'; document.getElementById('u-search').value = ''; }
+
+function deleteStudent(roll) {
+  if (confirm('Delete ' + roll + '?')) { students = students.filter(s => s.roll !== roll); renderTable(); }
+}
+
+function renderTable(data) {
+  const rows = data || students;
+  document.getElementById('rec-count').textContent = students.length + ' Records';
+  const tbody = document.getElementById('tbl-body');
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#555;padding:20px">No students found</td></tr>'; return; }
+  tbody.innerHTML = rows.map((s, i) => `<tr><td>${i+1}</td><td>${s.fn}</td><td>${s.ln}</td><td><span class="roll-badge">${s.roll}</span></td><td>${s.contact}</td><td>${s.date}</td><td><button class="btn-edit" onclick="editRow('${s.roll}')">Edit</button><button class="btn-del" onclick="deleteStudent('${s.roll}')">Delete</button></td></tr>`).join('');
+}
+
+function editRow(roll) {
+  document.querySelectorAll('.nav button')[1].click();
+  document.getElementById('u-search').value = roll;
+  findStudent();
+}
+
+function filterTable() {
+  const q = document.getElementById('filter').value.toLowerCase();
+  renderTable(students.filter(s => s.fn.toLowerCase().includes(q) || s.ln.toLowerCase().includes(q) || s.roll.toLowerCase().includes(q)));
+}
+</script>
+</body>
+</html>
